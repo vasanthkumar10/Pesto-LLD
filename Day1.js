@@ -110,15 +110,21 @@
 // }
 
 // syntactic sugar
-function person(name, age) {
-  this.name = name;
-  this.age = age;
-}
+// function person(name, age) {
+//   this.name = name;
+//   this.age = age;
+// }
 
-// singleton -> global
+// // singleton -> global
 
-const vasanth = new person("vasanth", 10);
-const virat = new person("virat", 18);
-console.log(vasanth);
-// console.log("_____________________________________________________________");
-console.log(virat);
+// const vasanth = new person("vasanth", 10);
+// const virat = new person("virat", 18);
+// console.log(vasanth);
+// // console.log("_____________________________________________________________");
+// console.log(virat);
+
+const users = ["vasanth", "deepak", "karthik", "ram"];
+// user -> karthik
+const index = users.findIndex("karthik");
+users.splice(index, 1);
+console.log(users);
