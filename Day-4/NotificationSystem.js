@@ -1,5 +1,9 @@
 // Observer Pattern
 
+// The Observer pattern is a behavioral design pattern that defines a one-to-many dependency between 
+// objects so that when one object (the subject) changes state, all its dependents (observers) 
+// are notified and updated automatically. 
+
 class User {
   constructor(name) {
     this.name = name;
