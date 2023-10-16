@@ -1,7 +1,9 @@
-// Memento
+// ------------------------------------------------
+// MEMENTO pattern
+// ------------------------------------------------
 
 // Originator -> the content provider or playground
-class codeEditor {
+class TextFile {
   constructor() {
     this.content = "";
   }
@@ -24,7 +26,6 @@ class codeEditor {
 }
 
 // Memento -> Represents the exact saved snapshot
-
 class Memento {
   constructor(content) {
     this.state = content;
@@ -35,8 +36,8 @@ class Memento {
   }
 }
 
-// manages undo and redo ops
-class Caretaker {
+// caretaker -> manages undo and redo ops
+class CodeEditor {
   constructor() {
     this.history = [];
     this.currentIndex = -1;
@@ -47,48 +48,73 @@ class Caretaker {
     this.currentIndex = this.history.length - 1;
   }
 
-  // undo
-  undo(editor) {
+  undo(file) {
     if (this.currentIndex > 0) {
       this.currentIndex--;
-      editor.restore(this.history[this.currentIndex]);
+      file.restore(this.history[this.currentIndex]);
     }
   }
 
-  //   redo
-  redo(editor) {
+  redo(file) {
     if (this.currentIndex < this.history.length - 1) {
       this.currentIndex++;
-      editor.restore(this.history[this.currentIndex]);
+      file.restore(this.history[this.currentIndex]);
     }
   }
 }
 
 // editor
-const vscode = new codeEditor();
-console.log(vscode.getContent());
-const file = new Caretaker();
+// const file = new TextFile();
+// console.log(file.getContent());
+// file.setContent("This is line 1");
+// console.log(file.getContent());
 
-vscode.setContent("This is line 1");
-console.log(vscode.getContent());
-file.save(vscode.createMemento());
-// console.log(file);
+// const vscode = new CodeEditor();
+// vscode.save(file.createMemento());
+// console.log(vscode);
 
-vscode.setContent("This is modified line");
-console.log(vscode.getContent());
-file.save(vscode.createMemento());
-vscode.setContent("This is modified 2 line ");
-file.save(vscode.createMemento());
-// console.log(file);
+// file.setContent("This is modified line 1");
+// console.log(file.getContent());
 
-console.log(vscode.getContent());
-file.undo(vscode);
-console.log(vscode.getContent());
-file.undo(vscode);
-console.log(vscode.getContent());
-file.undo(vscode);
-console.log(vscode.getContent());
-file.redo(vscode);
-console.log(vscode.getContent());
-file.redo(vscode);
-console.log(vscode.getContent());
+// vscode.save(file.createMemento());
+// console.log(vscode);
+
+// vscode.undo(file);
+// console.log(vscode);
+// console.log(file.getContent());
+
+// vscode.redo(file);
+// console.log(vscode);
+// console.log(file.getContent());
+
+// testing
+const file = new TextFile();
+const vscode = new CodeEditor();
+
+console.log("Initial text -> ", file.getContent());
+file.setContent("This is LLD class day 3");
+vscode.save(file.createMemento());
+// console.log(file.getContent());
+// console.log("-".repeat(50));
+file.setContent("This is LLD class day 4");
+vscode.save(file.createMemento());
+// console.log(file.getContent());
+// console.log("-".repeat(50));
+file.setContent("This is LLD class day 5");
+vscode.save(file.createMemento());
+// console.log(file.getContent());
+// console.log("-".repeat(50));
+
+// console.log(vscode);
+
+console.log(file.getContent());
+vscode.undo(file);
+console.log(file.getContent());
+vscode.undo(file);
+console.log(file.getContent());
+vscode.redo(file);
+console.log(file.getContent());
+vscode.redo(file);
+console.log(file.getContent());
+vscode.redo(file);
+console.log(file.getContent());
