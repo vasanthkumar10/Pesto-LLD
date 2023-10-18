@@ -26,9 +26,9 @@ class Seat {
 }
 
 class Screen {
-  constructor(screenNumber, rows, columns) {
+  constructor(screenNumber, rows, cols) {
     this.screenNumber = screenNumber;
-    this.seats = this.generateSeats(rows, columns);
+    this.seats = this.generateSeats(rows, cols);
   }
 
   generateSeats(rows, cols) {
@@ -42,21 +42,20 @@ class Screen {
     return seats;
   }
 
+  getAvailableSeats() {
+    return this.seats.filter((seat) => !seat.isBooked);
+  }
+
   getOverlappingSeats(seatNames) {
     const overlappingSeats = [];
-
     for (let seatName of seatNames) {
       const seat = this.seats.find((seat) => seat.name === seatName);
       if (seat && seat.isBooked) {
-        overlappingSeats.push(seatName);
+        overlappingSeats.push(seat);
       }
     }
 
     return overlappingSeats;
-  }
-
-  getAvailableSeats() {
-    return this.seats.filter((seat) => !seat.isBooked);
   }
 
   bookSeats(seatNames) {
@@ -101,7 +100,6 @@ class Theatre {
 
   getAvailableShows() {
     const currentTime = new Date();
-    // console.log("current time", currentTime);
     const availableShows = this.shows.filter(
       (show) => new Date(show.startTime) > currentTime
     );
@@ -116,36 +114,38 @@ class UserSession {
     this.selectedSeats = [];
     this.paymentAttempt = 0;
     this.MAX_PAYMENT_ATTEMPTS = 3;
-    this.closed = false;
+    this.open = true;
   }
 
   selectSeats(seatNames) {
-    if (!this.closed) {
-      const overLappingSeats = this.screen.getOverlappingSeats(seatNames);
-      //   console.log("overlapping seats", overLappingSeats);
+    if (this.open) {
+      const overlappingSeats = this.screen.getOverlappingSeats(seatNames);
+      // console.log("overlapping seats", overlappingSeats);
 
-      if (overLappingSeats.length > 0) {
+      if (overlappingSeats.length > 0) {
         console.log(
           "Some of your seat is already blocked by other user",
-          overLappingSeats
+          overlappingSeats
         );
         return;
       }
+
       this.selectedSeats = seatNames;
       this.screen.bookSeats(seatNames);
+    } else {
+      console.log("Current session closed. Please login again");
     }
   }
 
   makePayment() {
-    if (!this.closed) {
+    if (this.open) {
       // Assumption
       const paymentSuccess = false;
-
       if (paymentSuccess) {
         console.log(
           `Payment succeeded for ${this.user}. Selected Seats: ${this.selectedSeats}`
         );
-        this.closed = true;
+        this.open = false;
       } else {
         this.paymentAttempt++;
         console.log(
@@ -158,7 +158,7 @@ class UserSession {
           console.log(
             `Maximum payment retries reached. Releasing seats ${this.selectedSeats}`
           );
-          this.closed = true;
+          this.open = false;
           this.screen.releaseSeats(this.selectedSeats);
         }
       }
@@ -166,61 +166,77 @@ class UserSession {
   }
 }
 
-const pvr = new Theatre("PVR", "Delhi");
+const pvr = new Theatre("PVR", "Chennai");
 const screen1 = new Screen(1, 3, 3);
 const morningShow = new Show(
   "Jawan",
-  new Date("2023-09-10T10:00"),
+  new Date("2023-10-18T10:00:00Z"),
   180,
   screen1
 );
 
-const afterNoonShow = new Show(
+const afternoonShow = new Show(
   "Jawan",
-  new Date("2023-09-10T16:00"),
+  new Date("2023-10-18T16:00:00Z"),
   180,
   screen1
 );
 
-const midNightShow = new Show(
+const midnightShow = new Show(
   "Jawan",
-  new Date("2023-09-10T23:00"),
+  new Date("2023-10-18T22:00:00Z"),
   180,
   screen1
 );
 
-// console.log(morningShow);
 pvr.addScreen(screen1);
 pvr.addShow(morningShow);
-pvr.addShow(afterNoonShow);
-pvr.addShow(midNightShow);
+pvr.addShow(afternoonShow);
+pvr.addShow(midnightShow);
 
 // console.log(pvr);
 // console.log(pvr.getAvailableShows());
 
-// const session = new UserSession("vasanth", screen1);
-// // console.log(screen1.getAvailableSeats());
-// session.selectSeats(["A1", "A2", "B1"]);
-// session.makePayment();
-// session.makePayment();
-// session.makePayment();
-
-// // console.log(session);
 // console.log(screen1.getAvailableSeats());
-// // console.log(screen1.seats);
+// screen1.bookSeats(["A1", "A2"]);
+// console.log(screen1.getAvailableSeats());
+// screen1.releaseSeats(["A1", "A2"]);
+// console.log(screen1.getAvailableSeats());
+// console.log(screen1);
 
-const sourav = new UserSession("Sourav", midNightShow.screen);
-const sampath = new UserSession("Sampath", midNightShow.screen);
-// console.log(sourav);
-// console.log(sampath);
+// console.log(morningShow);
 
-// 2 users are logging in and try to book
-let availableSeats = midNightShow.screen.getAvailableSeats();
-console.log("available seats", availableSeats);
+const vasanth = new UserSession("Vasanth", morningShow.screen);
+const kumar = new UserSession("Kumar", morningShow.screen);
+// console.log(vasanth);
+// console.log(kumar);
 
-sourav.selectSeats(["A1", "A2"]);
-console.log(`Seats selected by ${sourav.user}: ${sourav.selectedSeats}`);
-console.log("available seats", midNightShow.screen.getAvailableSeats());
+// const availableSeats = morningShow.screen.getAvailableSeats();
+// console.log("availableSeats", availableSeats);
 
-sampath.selectSeats(["A1", "A2"]);
-console.log(`Seats selected by ${sampath.user}: ${sampath.selectedSeats}`);
+// vasanth.selectSeats(["A1", "A2"]);
+// vasanth.makePayment();
+// vasanth.makePayment();
+// vasanth.makePayment();
+// // console.log(morningShow.screen.getAvailableSeats());
+// // console.log(vasanth);
+
+// 2 users logging in and booking different seats
+// console.log(morningShow.screen.getAvailableSeats());
+// vasanth.selectSeats(["A1", "A2"]);
+// console.log(`Seats selected by ${vasanth.user}: ${vasanth.selectedSeats}`);
+// console.log("availableSeats", morningShow.screen.getAvailableSeats());
+
+// kumar.selectSeats(["B1", "B2"]);
+// console.log(`Seats selected by ${kumar.user}: ${kumar.selectedSeats}`);
+// console.log("availableSeats", morningShow.screen.getAvailableSeats());
+
+// 2 users logging in and booking same seats
+console.log(morningShow.screen.getAvailableSeats());
+vasanth.selectSeats(["A1", "A2"]);
+console.log(`Seats selected by ${vasanth.user}: ${vasanth.selectedSeats}`);
+console.log("availableSeats", morningShow.screen.getAvailableSeats());
+
+kumar.selectSeats(["A1", "A2"]);
+console.log(`Seats selected by ${kumar.user}: ${kumar.selectedSeats}`);
+console.log("availableSeats", morningShow.screen.getAvailableSeats());
